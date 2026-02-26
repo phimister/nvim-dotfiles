@@ -56,7 +56,7 @@ now(function()
   vim.o.complete    = '.,w,b,kspell'     -- Use less sources
   vim.o.completeopt = 'menuone,noselect' -- Use custom behavior
 
-  vim.cmd('colorscheme minisummer')
+  vim.cmd('colorscheme randomhue')
 end)
 
 now(function()
@@ -108,10 +108,37 @@ later(function() require('mini.visits').setup() end)
 later(function() require('mini.extra').setup() end)
 later(function() require('mini.jump').setup() end)
 
+
+later(function() require('mini.cursorword').setup() end)
 later(function() require('mini.cmdline').setup() end)
 later(function() require("mini.map").setup() end)
 -- later(function() require('mini.colors').setup() end)
 -- later(function() require('mini.animate').setup() end)
+
+-- TODO:
+-- later(function() require('mini.jump2d').setup() end)
+-- later(function() require('mini.hipatterns').setup() end)
+-- fix map ??
+-- git?
+-- completion
+-- treesitter + lsp
+
+later(function() require('mini.files').setup({
+  mappings = {
+    close       = '<ESC>',
+    go_in       = '<Right>',
+    go_in_plus  = '<CR>',
+    go_out      = '<Left>',
+    go_out_plus = '<S-Left>',
+    show_help   = 'h',
+  },
+  windows = {
+    preview = true,
+    border = "rounded",
+    width_preview = 80,
+  },
+})
+end)
 
 later(function() require('mini.pairs').setup({ modes = { insert = true, command = true, terminal = false } }) end)
 
