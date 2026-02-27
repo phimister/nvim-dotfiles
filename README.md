@@ -8,8 +8,16 @@ References:
 - [example1](https://gitlab.com/domsch1988/mvim/-/blob/main/init.lua)
 - [example2](https://github.com/echasnovski/nvim/blob/master/plugin/10_options.lua)
 
-# FUTURE TODO
-- [friendly-snippets](https://github.com/rafamadriz/friendly-snippets/tree/main)
-- `:lua MiniJump2d.start(MiniJump2d.builtin_opts.single_character)`
-- `:lua MiniDiff.toggle_overlay()`
-- single char jump sj<char> `vim.keymap.set({ 'n', 'x', 'o' }, 'sj', function() MiniJump2d.start(MiniJump2d.builtin_opts.single_character) end)`
+# TODO
+- Configure LSP
+- Setup keymaps
+- Update clues
+- Revisit FIXMEs
+
+```
+# jump2d find from 1 character input
+:lua MiniJump2d.start(MiniJump2d.builtin_opts.single_character)`
+
+# toggle inline diff
+:lua MiniDiff.toggle_overlay()`
+```

@@ -24,28 +24,24 @@ now(function()
   vim.g.mapleader = ' '
 
   vim.o.mouse = 'a'
-  -- vim.o.swapfile = false
-  -- vim.o.updatetime = 1000
   vim.o.backup = false
   vim.o.undofile = true
   vim.o.confirm = true
-  -- vim.o.showmode = true
   vim.o.autoindent = true
   vim.o.expandtab = true
   vim.o.shiftwidth = 2 -- Use this number of spaces for indentation
   vim.o.tabstop = 2 -- Show tab as this number of spaces
   vim.o.scrolloff = 20
+  vim.o.virtualedit = 'block' -- Allow going past end of line in blockwise mode
+  vim.o.iskeyword = '@,48-57,_,192-255,-' -- Treat dash as `word` textobject part
+  vim.o.spelloptions = 'camel' -- Treat camelCase word parts as separate words
 
   -- FIXME: delete or keep ??
-  -- vim.o.softtabstop = 2
   vim.o.switchbuf = 'usetab'
   vim.o.breakindentopt = 'list:-1'  -- Add padding for lists (if 'wrap' is set)
   vim.o.colorcolumn    = '+1'       -- Draw column on the right of maximum width
   vim.o.list           = true       -- Show helpful text indicators
   vim.o.formatoptions = 'rqnl1j'   -- Improve comment editing
-  vim.o.spelloptions  = 'camel'    -- Treat camelCase word parts as separate words
-  vim.o.virtualedit   = 'block'    -- Allow going past end of line in blockwise mode
-  vim.o.iskeyword = '@,48-57,_,192-255,-' -- Treat dash as `word` textobject part
   -- Pattern for a start of 'numbered' list (used in `gw`). This reads as
   -- "Start of list item is: at least one special character (digit, -, +, *)
   -- possibly followed by punctuation (. or `)`) followed by at least one space".
@@ -289,45 +285,6 @@ end)
 
 -- ( plugins )--------------------------------------------
 
--- TODO:
--- treesitter + lsp
-
--- Tree-sitter ================================================================
--- now(function()
---   local ts_update = function() vim.cmd('TSUpdate') end
---   add({
---     'https://github.com/nvim-treesitter/nvim-treesitter',
---     { src = 'https://github.com/nvim-treesitter/nvim-treesitter-textobjects', version = 'main' },
---   })
---
---   -- Ensure installed
---   --stylua: ignore
---   local ensure_languages = {
---     'bash', 'c',          'cpp',  'css',   'diff', 'go',
---     'html', 'javascript', 'json', 'julia', 'nu',   'php', 'python',
---     'r',    'regex',      'rst',  'rust',  'toml', 'tsx', 'typescript', 'yaml',
---   }
---   local isnt_installed = function(lang) return #vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', false) == 0 end
---   local to_install = vim.tbl_filter(isnt_installed, ensure_languages)
---   if #to_install > 0 then require('nvim-treesitter').install(to_install) end
---
---   -- Ensure enabled
---   local filetypes = vim.iter(ensure_languages):map(vim.treesitter.language.get_filetypes):flatten():totable()
---   vim.list_extend(filetypes, { 'markdown', 'quarto' })
---   local ts_start = function(ev) vim.treesitter.start(ev.buf) end
---   _G.Config.new_autocmd('FileType', filetypes, ts_start, 'Ensure enabled tree-sitter')
--- end)
-
--- now(function()
---   -- Use other plugins with `add()`. It ensures plugin is available in current
---   -- session (installs if absent)
---   add({
---     source = 'neovim/nvim-lspconfig',
---     -- Supply dependencies near target plugin
---     depends = { 'williamboman/mason.nvim' },
---   })
--- end)
-
 later(function()
   add({
     source = 'nvim-treesitter/nvim-treesitter',
@@ -349,6 +306,18 @@ later(function()
   local ts_start = function(ev) vim.treesitter.start(ev.buf) end
   vim.api.nvim_create_autocmd('FileType', {pattern = filetypes, callback = ts_start, desc = 'Ensure enabled tree-sitter'})
 end)
+
+-- FIXME: mason, lspconfig, etc.
+-- now(function()
+--   -- Use other plugins with `add()`. It ensures plugin is available in current
+--   -- session (installs if absent)
+--   add({
+--     source = 'neovim/nvim-lspconfig',
+--     -- Supply dependencies near target plugin
+--     depends = { 'williamboman/mason.nvim' },
+--   })
+-- end)
+
 
 later(function() add({ source = 'https://github.com/rafamadriz/friendly-snippets' }) end)
 
