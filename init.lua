@@ -35,12 +35,15 @@ now(function()
   vim.o.virtualedit = 'block' -- Allow going past end of line in blockwise mode
   vim.o.iskeyword = '@,48-57,_,192-255,-' -- Treat dash as `word` textobject part
   vim.o.spelloptions = 'camel' -- Treat camelCase word parts as separate words
+  vim.o.termguicolors = true
 
   -- FIXME: delete or keep ??
   vim.o.switchbuf = 'usetab'
-  vim.o.breakindentopt = 'list:-1'  -- Add padding for lists (if 'wrap' is set)
   vim.o.colorcolumn    = '+1'       -- Draw column on the right of maximum width
+  vim.o.breakindentopt = 'list:-1'  -- Add padding for lists (if 'wrap' is set)
   vim.o.list           = true       -- Show helpful text indicators
+  vim.o.listchars = 'extends:…,nbsp:␣,precedes:…,tab:> '
+  vim.o.fillchars = 'eob: ,fold:╌'
   vim.o.formatoptions = 'rqnl1j'   -- Improve comment editing
   -- Pattern for a start of 'numbered' list (used in `gw`). This reads as
   -- "Start of list item is: at least one special character (digit, -, +, *)
@@ -49,6 +52,9 @@ now(function()
   -- Built-in completion
   vim.o.complete    = '.,w,b,kspell'     -- Use less sources
   vim.o.completeopt = 'menuone,noselect' -- Use custom behavior
+  -- vim.o.foldlevel   = 1        -- Fold everything except top level
+  -- vim.o.foldmethod  = 'indent' -- Fold based on indent level
+  -- vim.o.foldnestmax = 10       -- Limit number of fold levels
 
   vim.cmd('colorscheme randomhue')
 end)
@@ -91,26 +97,21 @@ now(function()
   local process_items = function(items, base)
     return MiniCompletion.default_process_items(items, base, process_items_opts)
   end
-  require('mini.completion').setup()
 
-  -- FIXME: https://nvim-mini.org/mini.nvim/doc/mini-completion.html#module-helpfulmappings
-  -- require('mini.completion').setup({
-  --   lsp_completion = { source_func = 'omnifunc', auto_setup = false, process_items = process_items },
-  -- })
+  require('mini.completion').setup({
+    lsp_completion = { source_func = 'omnifunc', auto_setup = false, process_items = process_items },
+  })
 
-  -- -- Set up LSP part of completion
-  -- local on_attach = function(args) vim.bo[args.buf].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp' end
-  -- _G.Config.new_autocmd('LspAttach', '*', on_attach, 'Custom `on_attach`')
-  -- if vim.fn.has('nvim-0.11') == 1 then vim.lsp.config('*', { capabilities = MiniCompletion.get_lsp_capabilities() }) end
-
-  -- vim.lsp.on_type_formatting.enable()
-  -- vim.o.autocomplete = true
+  -- Set up LSP part of completion
+  local on_attach = function(args) vim.bo[args.buf].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp' end
+  vim.api.nvim_create_autocmd('LspAttach', { callback = on_attach })
+  vim.lsp.config('*', { capabilities = MiniCompletion.get_lsp_capabilities() })
 end)
 
 
 -- ( later )--------------------------------------------
 
-later(function() require('mini.ai').setup() end)
+later(function() require('mini.extra').setup() end)
 later(function() require('mini.align').setup() end)
 later(function() require('mini.comment').setup() end)
 later(function() require('mini.operators').setup() end)
@@ -121,15 +122,34 @@ later(function() require('mini.indentscope').setup() end)
 later(function() require('mini.bracketed').setup() end)
 later(function() require('mini.bufremove').setup() end)
 later(function() require('mini.visits').setup() end)
-later(function() require('mini.extra').setup() end)
 later(function() require('mini.jump').setup() end)
 later(function() require('mini.cursorword').setup() end)
 
 later(function() require('mini.git').setup() end)
 later(function() require('mini.diff').setup() end)
 
--- later(function() require('mini.colors').setup() end)
+later(function() require('mini.colors').setup() end)
 -- later(function() require('mini.animate').setup() end)
+
+later(function()
+  local ai = require('mini.ai')
+  ai.setup({
+    custom_textobjects = {
+      B = MiniExtra.gen_ai_spec.buffer(),
+      D = MiniExtra.gen_ai_spec.diagnostic(),
+      I = MiniExtra.gen_ai_spec.indent(),
+      L = MiniExtra.gen_ai_spec.line(),
+      N = MiniExtra.gen_ai_spec.number(),
+      F = ai.gen_spec.treesitter({ a = '@function.outer', i = '@function.inner' }),
+      c = ai.gen_spec.treesitter({ a = '@class.outer', i = '@class.inner' }),
+      o = ai.gen_spec.treesitter({
+        a = { '@block.outer', '@loop.outer', '@conditional.outer' },
+        i = { '@block.inner', '@loop.inner', '@conditional.inner' },
+      }),
+    },
+    search_method = 'cover',
+  })
+end)
 
 later(function()
   -- disable `shellcmd` autocomplete
@@ -285,17 +305,25 @@ end)
 
 -- ( plugins )--------------------------------------------
 
-later(function()
+now(function()
   add({
     source = 'nvim-treesitter/nvim-treesitter',
     hooks = { post_checkout = function() vim.cmd('TSUpdate') end },
   })
 
+  add({
+    source = 'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+  })
+
+  add({
+    source = 'https://github.com/nvim-treesitter/nvim-treesitter-context',
+  })
+
   -- Ensure installed
   local ensure_languages = {
     'bash', 'c', 'cpp', 'css', 'diff', 'go',
-    'html', 'javascript', 'json', 'rust', 'ruby', 'perl', 'python',
-    'regex', 'toml', 'lua', 'vimdoc'
+    'html', 'javascript', 'json', 'rust', 'python',
+    'regex', 'toml', 'lua', 'vimdoc', 'markdown',
   }
   local isnt_installed = function(lang) return #vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', false) == 0 end
   local to_install = vim.tbl_filter(isnt_installed, ensure_languages)
@@ -307,17 +335,25 @@ later(function()
   vim.api.nvim_create_autocmd('FileType', {pattern = filetypes, callback = ts_start, desc = 'Ensure enabled tree-sitter'})
 end)
 
--- FIXME: mason, lspconfig, etc.
--- now(function()
---   -- Use other plugins with `add()`. It ensures plugin is available in current
---   -- session (installs if absent)
---   add({
---     source = 'neovim/nvim-lspconfig',
---     -- Supply dependencies near target plugin
---     depends = { 'williamboman/mason.nvim' },
---   })
--- end)
+now(function()
+  add({
+    source = 'https://github.com/neovim/nvim-lspconfig',
+    depends = { 'https://github.com/mason-org/mason.nvim' },
+  })
 
+  require('mason').setup()
+
+  vim.lsp.enable({
+    'gopls',
+    'emmylua_ls',
+    'pyright',
+    'ruff',
+    -- 'marksman',
+    'harper_ls',
+    'rust_analyzer',
+  })
+end)
 
 later(function() add({ source = 'https://github.com/rafamadriz/friendly-snippets' }) end)
 
+-- later(function() add({ source = 'https://github.com/MeanderingProgrammer/render-markdown.nvim' }) end)
