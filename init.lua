@@ -77,6 +77,12 @@ now(function()
   })
 end)
 
+now(function()
+  require("autocmds")
+  require("keymaps")
+  require("filetypes")
+end)
+
 now(function() require('mini.icons').setup() end)
 now(function() require('mini.notify').setup() end)
 now(function() require('mini.starter').setup() end)
