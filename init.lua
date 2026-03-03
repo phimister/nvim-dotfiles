@@ -24,6 +24,7 @@ now(function()
   vim.g.mapleader = ' '
 
   vim.o.mouse = 'a'
+  vim.o.mousescroll = 'ver:8'
   vim.o.backup = false
   vim.o.undofile = true
   vim.o.confirm = true
@@ -130,12 +131,29 @@ later(function() require('mini.bufremove').setup() end)
 later(function() require('mini.visits').setup() end)
 later(function() require('mini.jump').setup() end)
 later(function() require('mini.cursorword').setup() end)
+later(function() require('mini.colors').setup() end)
 
 later(function() require('mini.git').setup() end)
 later(function() require('mini.diff').setup() end)
 
-later(function() require('mini.colors').setup() end)
--- later(function() require('mini.animate').setup() end)
+
+later(function()
+  local animate = require("mini.animate")
+  animate.setup({
+    -- scroll = { enable = false },
+    cursor = {
+      path = animate.gen_path.line({
+        -- Enable animation when moving horizontally within the same line as
+        -- long as the jump is more than 30 cols. By default, animation is
+        -- disabled when moving horizontally.
+        predicate = function(dest)
+          local rows, cols = unpack(dest)
+          return math.abs(rows) > 1 or math.abs(cols) > 30
+        end,
+      }),
+    },
+  })
+end)
 
 later(function()
   local ai = require('mini.ai')
@@ -158,14 +176,20 @@ later(function()
 end)
 
 later(function()
+  -- set `same` symbol (one-liner)
+  local peek_stc_opts = { signs = { same = '›' } }
+  local peek_stc = function(data)
+    return MiniCmdline.default_autopeek_statuscolumn(data, peek_stc_opts)
+  end
   -- disable `shellcmd` autocomplete
   local block_compltype = { shellcmd = true }
   require('mini.cmdline').setup({
     autocomplete = {
-      predicate = function()
-        return not block_compltype[vim.fn.getcmdcompltype()]
+      predicate = function(data)
+        return not block_compltype[vim.fn.getcmdcompltype()] and data.line:find('%a') ~= nil
       end,
     },
+    autopeek = { window = { statuscolumn = peek_stc } },
   })
 end)
 
@@ -236,11 +260,20 @@ later(function()
       { mode = { 'n', 'x' }, keys = 'z' },        -- `z` key
     },
     clues = {
-      -- Enhance this by adding descriptions for <Leader> mapping groups
+      { mode = "n",        keys = "<Leader>b",  desc = "+Buffer" },
+      { mode = "n",        keys = "<Leader>e",  desc = "+Explore" },
+      { mode = "n",        keys = "<Leader>f",  desc = "+Find" },
+      { mode = {"n", "x"}, keys = "<Leader>g",  desc = "+Git" },
+      { mode = {"n", "x"}, keys = "<Leader>l",  desc = "+Language" },
+      { mode = "n",        keys = "<Leader>m",  desc = "+Map" },
+      { mode = "n",        keys = "<Leader>o",  desc = "+Other" },
+      { mode = "n",        keys = "<Leader>s",  desc = "+Session" },
+      { mode = "n",        keys = "<Leader>v",  desc = "+Visits" },
+      { mode = "n",        keys = "<Leader>w",  desc = "+Window" },
       miniclue.gen_clues.builtin_completion(),
       miniclue.gen_clues.g(),
       miniclue.gen_clues.marks(),
-      miniclue.gen_clues.registers(),
+      miniclue.gen_clues.registers({ show_contents = true }),
       miniclue.gen_clues.windows(),
       miniclue.gen_clues.z(),
     },
@@ -355,7 +388,7 @@ now(function()
     'pyright',
     'ruff',
     -- 'marksman',
-    'harper_ls',
+    -- 'harper_ls',
     'rust_analyzer',
   })
 end)
