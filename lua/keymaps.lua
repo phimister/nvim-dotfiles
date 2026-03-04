@@ -12,9 +12,9 @@ local C = function(cmd) return "<Cmd>" .. cmd .. "<CR>" end
 -- Exit terminal window
 vim.keymap.set('t', '<C-h>', [[<C-\><C-N><C-w>h]])
 
-map("i",   "<A-Space>", C"normal ciw ",                                                "Just one space")
-map("n",   "z=",        C"Pick spellsuggest",                                          "Spelling suggestions")
-map("nxo", "sj",        C"MiniJump2d.start(MiniJump2d.builtin_opts.single_character)", "Single Jump2d")
+map("i",   "<A-Space>", C"normal ciw ",                                                    "Just one space")
+map("n",   "z=",        C"Pick spellsuggest",                                              "Spelling suggestions")
+map("nxo", "sj",        C"lua MiniJump2d.start(MiniJump2d.builtin_opts.single_character)", "Single Jump2d")
 
 -- ( Frequently Used Pickers )---------------------------------------------------------------------------
 
@@ -102,8 +102,6 @@ map("nx", L"gs", C"lua MiniGit.show_at_cursor()",     "Show at cursor")
 
 map("nx", L"la", C"lua vim.lsp.buf.code_action()",     "Actions")
 map("n",  L"ld", C"lua vim.diagnostic.open_float()",   "Diagnostic popup")
--- FIXME: formatting
--- map("nx", L"lf", C"lua require('conform').format()",   "Format")
 map("n",  L"li", C"lua vim.lsp.buf.implementation()",  "Implementation")
 map("n",  L"lI", C"LspInfo",                           "LSP info")
 map("n",  L"lh", C"lua vim.lsp.buf.hover()",           "Hover")
@@ -123,11 +121,11 @@ map("n", L"mt", C"lua MiniMap.toggle()",       "Toggle map")
 
 -- ( Other )---------------------------------------------------------------------------
 
-map("n", L"om", C"Mason",                  "Mason")
-map("n", L"os", C"lua MiniStarter.open()", "Open MiniStarter")
-map("n", L"ou", C"DepsUpdate",             "Update deps")
-map("n", L"oc", C"DepsClean",              "Clean deps")
-map("n", L"ot", C"belowright terminal",    "Open Terminal")
+map("n", L"om", C"Mason",                      "Mason")
+map("n", L"os", C"lua MiniStarter.open()",     "Open MiniStarter")
+map("n", L"ou", C"DepsUpdate",                 "Update deps")
+map("n", L"oc", C"DepsClean",                  "Clean deps")
+map("n", L"ot", C"botright vsplit | terminal", "Open Terminal")
 
 -- ( Session )---------------------------------------------------------------------------
 

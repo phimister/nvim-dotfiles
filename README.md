@@ -1,29 +1,20 @@
-# Nvim Dotfiles
-minimal neovim config with mini.nvim
-packages managed with `mini.deps` 
+# My Neovim Config
+A minimal Neovim config built around [mini.nvim][mini]. *Heavily* inspired by [echasnovski/nvim][1] and [pkazmier/nvim][2].
+
+[mini]: https://nvim-mini.org/mini.nvim/
+[1]: https://github.com/echasnovski/nvim
+[2]: https://github.com/pkazmier/nvim
+
+Configured for `NVIM v0.11.6`, this includes:
+- The `mini.nvim` suite
+- `nvim-treesitter`, with:
+    - `nvim-treesitter-textobjects`
+    - `nvim-treesitter-context`
+- LSP with `lspconfig` and `Mason`
+- `friendly-snippets`
+
+**Packages managed with `mini.deps`.**
 
 > [!NOTE]
-> switch to vim.pack.add() in 0.12+
-> also bubilt-in undotree plugin
+> Nvim 0.12+ offers `vim.pack.add()` and an included `undotree` plugin.
 
-References:
-- [mini.nvim](https://github.com/nvim-mini/mini.nvim)
-- [mini.deps](https://nvim-mini.org/mini.nvim/scripts/init-deps-example.lua)
-- [example #1](https://github.com/echasnovski/nvim/blob/master/plugin/10_options.lua)
-- [example #2](https://github.com/pkazmier/nvim)
-
-## TO-DO
-- Setup keymaps
-- Update clues
-- Revisit FIXMEs
-
-
-``` lua
--- jump2d find from 1 character input
-MiniJump2d.start(MiniJump2d.builtin_opts.single_character)`
-
--- toggle inline diff
-MiniDiff.toggle_overlay()`
-
--- Mini.Extra pickers
-```

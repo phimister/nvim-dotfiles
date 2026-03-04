@@ -13,13 +13,10 @@ end
 
 -- Set up 'mini.deps'
 require('mini.deps').setup({ path = { package = path_package } })
-
--- Use 'mini.deps'. `now()` and `later()` are helpers for a safe two-stage
--- startup and are optional.
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
+-- ( basics )----------------------------------------------
 
--- ( now )----------------------------------------------
 now(function()
   vim.g.mapleader = ' '
 
@@ -37,22 +34,23 @@ now(function()
   vim.o.iskeyword = '@,48-57,_,192-255,-' -- Treat dash as `word` textobject part
   vim.o.spelloptions = 'camel' -- Treat camelCase word parts as separate words
   vim.o.termguicolors = true
-
-  -- FIXME: delete or keep ??
-  vim.o.switchbuf = 'usetab'
   vim.o.colorcolumn    = '+1'       -- Draw column on the right of maximum width
+  vim.o.switchbuf = 'usetab'
   vim.o.breakindentopt = 'list:-1'  -- Add padding for lists (if 'wrap' is set)
   vim.o.list           = true       -- Show helpful text indicators
   vim.o.listchars = 'extends:…,nbsp:␣,precedes:…,tab:> '
   vim.o.fillchars = 'eob: ,fold:╌'
   vim.o.formatoptions = 'rqnl1j'   -- Improve comment editing
+
   -- Pattern for a start of 'numbered' list (used in `gw`). This reads as
   -- "Start of list item is: at least one special character (digit, -, +, *)
   -- possibly followed by punctuation (. or `)`) followed by at least one space".
   vim.o.formatlistpat = [[^\s*[0-9\-\+\*]\+[\.\)]*\s\+]]
+
   -- Built-in completion
   vim.o.complete    = '.,w,b,kspell'     -- Use less sources
   vim.o.completeopt = 'menuone,noselect' -- Use custom behavior
+
   -- vim.o.foldlevel   = 1        -- Fold everything except top level
   -- vim.o.foldmethod  = 'indent' -- Fold based on indent level
   -- vim.o.foldnestmax = 10       -- Limit number of fold levels
@@ -83,6 +81,8 @@ now(function()
   require("keymaps")
   require("filetypes")
 end)
+
+-- ( now )----------------------------------------------
 
 now(function() require('mini.icons').setup() end)
 now(function() require('mini.notify').setup() end)
@@ -115,7 +115,6 @@ now(function()
   vim.lsp.config('*', { capabilities = MiniCompletion.get_lsp_capabilities() })
 end)
 
-
 -- ( later )--------------------------------------------
 
 later(function() require('mini.extra').setup() end)
@@ -135,7 +134,6 @@ later(function() require('mini.colors').setup() end)
 
 later(function() require('mini.git').setup() end)
 later(function() require('mini.diff').setup() end)
-
 
 later(function()
   local animate = require("mini.animate")
@@ -176,7 +174,7 @@ later(function()
 end)
 
 later(function()
-  -- set `same` symbol (one-liner)
+  -- set custom `same` symbol for peek single line
   local peek_stc_opts = { signs = { same = '›' } }
   local peek_stc = function(data)
     return MiniCmdline.default_autopeek_statuscolumn(data, peek_stc_opts)
@@ -304,7 +302,6 @@ later(function()
       hack = hi_words({ 'HACK', 'Hack', 'hack' }, 'MiniHipatternsHack'),
       todo = hi_words({ 'TODO', 'Todo', 'todo' }, 'MiniHipatternsTodo'),
       note = hi_words({ 'NOTE', 'Note', 'note' }, 'MiniHipatternsNote'),
-
       hex_color = hipatterns.gen_highlighter.hex_color(),
     },
   })
@@ -340,7 +337,6 @@ later(function()
   })
   MiniSnippets.start_lsp_server()
 end)
-
 
 -- ( plugins )--------------------------------------------
 
@@ -387,8 +383,7 @@ now(function()
     'emmylua_ls',
     'pyright',
     'ruff',
-    -- 'marksman',
-    -- 'harper_ls',
+    'harper_ls',
     'rust_analyzer',
   })
 end)
